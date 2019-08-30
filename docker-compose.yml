@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+    db:
+        image: mariadb
+        command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+        restart: always
+        volumes:
+            - db:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: $MYSQL_DB
+            MYSQL_USER: $MYSQL_USER
+            MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+            MYSQL_PASSWORD: $MYSQL_PASSWORD
+
+    redis:
+        image: redis:alpine
+        restart: always
+        volumes:
+            - redis:/data
+
+    app:
+        image: nextcloud:fpm-alpine
+        restart: always
+        volumes:
+            - nextcloud:/var/www/html
+        environment:
+            REDIS_HOST: redis
+            MYSQL_HOST: db
+            MYSQL_DATABASE: $MYSQL_DB
+            MYSQL_USER: $MYSQL_USER
+            MYSQL_PASSWORD: $MYSQL_PASSWORD
+        depends_on:
+            - db
+            - redis
+
+    web:
+        build: ./web
+        restart: always
+        environment:
+            VIRTUAL_PORT: 8080
+            VIRTUAL_HOST: $VIRTUAL_HOST
+            LETSENCRYPT_HOST: $LETSENCRYPT_HOST
+            LETSENCRYPT_EMAIL: $LETSENCRYPT_EMAIL
+        ports:
+            - 8080:80
+        volumes:
+            - nextcloud:/var/www/html:ro
+        depends_on:
+            - app
+
+    cron:
+        image: nextcloud:fpm-alpine
+        restart: always
+        volumes:
+            - nextcloud:/var/www/html
+        entrypoint: /cron.sh
+        depends_on:
+            - db
+            - redis
+
+volumes:
+    db:
+    redis:
+    nextcloud:
+        driver_opts:
+            o: bind
+            device: /home/alf/nextcloud-data
+
+networks:
+    default:
+        external:
+            name: ${NETWORK:-webproxy}

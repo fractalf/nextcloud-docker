@@ -1,6 +1,3 @@
 # NextCloud setup with docker-compose
 
-My personal NextCloud setup based on
-
-* Nginx Proxy https://github.com/evertramos/docker-compose-letsencrypt-nginx-proxy-companion
-* NextCloud https://github.com/nextcloud/docker/blob/master/.examples/docker-compose/insecure/postgres/fpm/docker-compose.yml
+My personal NextCloud setup based on https://github.com/nextcloud/docker/tree/master/.examples/docker-compose/insecure/postgres/fpm
