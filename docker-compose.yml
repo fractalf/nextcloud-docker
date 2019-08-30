@@ -65,7 +65,7 @@ volumes:
     nextcloud:
         driver_opts:
             o: bind
-            device: /home/alf/nextcloud-data
+            device: $NEXTCLOUD_DATA
 
 networks:
     default:
