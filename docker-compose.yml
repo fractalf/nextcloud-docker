@@ -64,6 +64,7 @@ volumes:
     redis:
     nextcloud:
         driver_opts:
+            type: none
             o: bind
             device: $NEXTCLOUD_DATA
 
